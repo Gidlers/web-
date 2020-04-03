@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须定义，非绑定到类或是接口的方式 -->
+<mapper namespace="org.cdlg.group.dao.MessageDao">
+<!-- 添加消息 状态默认是未读消息 -->
+	<insert id="addMessage" parameterType="org.cdlg.group.entity.Message">
+    	insert into message(fromid,toid,type,time,content,status) values(#{fromid},#{toid},#{type},#{time},#{content},0) 
+   </insert> 
+   <!--  -->
+	<select id="readMessageByParam" resultType="org.cdlg.group.entity.Message" parameterType="org.cdlg.group.entity.Message"> 
+    	select * from message where 1=1
+  	<if test="fromid !=null and fromid !=''">
+  	and fromid = #{fromid}
+  	</if>
+  	<if test="toid !=null and toid !=''">
+  	and toid = #{toid}
+  	</if>
+  	<if test="type !=null and type !=''">
+  	and type = #{type}
+  	</if>
+  	and status = 0
+  	order by time desc
+  	</select>
+ 	<update id="updateMessageStatus" parameterType="org.cdlg.group.entity.Message">
+ 		update message set status = 1 where
+ 		fromid = #{fromid}
+ 		and toid = #{toid}
+ 		and type = #{type}
+ 	</update>
+ 	<!-- 读取消息 -->
+ 	<select id="findMessageCount" resultType="int" parameterType="org.cdlg.group.entity.Message"> 
+    	select count(1) ts from message where  fromid = #{fromid} 
+  		and toid = #{toid} 	
+  		and type = 0 	
+  		and status = 0
+  		order by id desc
+  	</select>
+  	<!-- 显示消息内容 -->
+  	<select id="readChatMessage" resultType="org.cdlg.group.entity.Message" parameterType="org.cdlg.group.entity.Message"> 
+    	 select * from message where  
+    	 (fromid = #{fromid}  and toid = #{toid} or fromid = #{toid}  and toid = #{fromid})
+  		and type =0
+  		order by id asc
+  	</select>
+</mapper>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须定义，非绑定到类或是接口的方式 -->
+<mapper namespace="org.cdlg.group.dao.ReplyDao">
+<!-- 添加动态 -->
+	<select id="findReplyBySid" parameterType="int" resultType="org.cdlg.group.entity.Reply">
+    select * from reply where sid=#{sid}
+  </select>
+  <!-- 增加回复 -->
+  <insert id="addReply" parameterType="org.cdlg.group.entity.Reply">
+		insert into reply (userid,nickname,sid,content,createdate) 
+		values(#{userid},#{nickname},#{sid},#{content},now()) 
+    </insert>
+    <!-- 查询回复条数 -->
+	<select id="findReplyCount" parameterType="int" resultType="int">
+    select count(1) ts from reply where sid =#{sid}
+  </select>
+</mapper>

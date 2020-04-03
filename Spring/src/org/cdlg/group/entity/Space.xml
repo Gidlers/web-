@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须定义，非绑定到类或是接口的方式 -->
+<mapper namespace="org.cdlg.group.dao.SpaceDao">
+<!-- 添加动态 -->
+	<insert id="addSpace" parameterType="org.cdlg.group.entity.Space">
+		insert into space (userid,nickname,content,pics,createdate,replynum) 
+		values(#{userid},#{nickname},#{content},#{pics},now(),0) 
+    </insert> 
+      
+    <select id="findSpaceByUid" resultType="org.cdlg.group.entity.Space">
+    select * from space
+  	</select>
+  	  <!-- zhao统计动态 -->
+    <select id="findSpace" resultType="org.cdlg.group.entity.Space" parameterType="map"> 
+     	select * from space where userid=#{userid}
+     	order by id
+    	limit #{startindex},3
+ 	 </select>
+ 	 <!-- zhao朋友统计动态 -->
+    <select id="findfriendSpace" resultType="org.cdlg.group.entity.Space" parameterType="map"> 
+     	select * from space where userid != #{userid}
+     	order by id
+    	limit #{startindex},3
+ 	 </select>
+ 	  <!-- 统计动态个数 -->
+ 	 <select id="spaceCount" resultType="int" parameterType="map"> 
+     	select count(1) ts from space where userid = #{userid}
+ 	 </select>
+ 	 <!-- 统计动态个数 -->
+ 	 <select id="spacefriendCount" resultType="int" parameterType="map"> 
+     	select count(1) ts from space where userid != #{userid}
+ 	 </select>
+ 	 <!-- 修改回复条数 -->
+ 	 <update id="updateSpaceCount" parameterType="int">
+ 	 	update space set replynum=#{count} where id in (select sid from reply)
+ 	 </update>
+</mapper>

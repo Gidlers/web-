@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须定义，非绑定到类或是接口的方式 -->
+<mapper namespace="org.cdlg.group.dao.UserDao">
+
+ <!-- 查询所有的用户    resultType 返回值 -->
+  <select id="findUsers" resultType="org.cdlg.group.entity.User">
+    select * from chatuser
+  </select>
+  <!-- 根据用户名和密码获取用户 -->
+  <select id="LoginUser" resultType="org.cdlg.group.entity.User" parameterType="map"> 
+    select * from chatuser where userid=#{username} and password=#{password} 
+  </select>
+  <!-- 得到用户 -->
+   <select id="getByUserid" parameterType="string" resultType="org.cdlg.group.entity.User"> 
+    select * from chatuser where userid=#{username}
+  </select>  
+  <!-- 根据组建查询单个对象 -->
+  <select id="findUserById" parameterType="int" resultType="org.cdlg.group.entity.User"> 
+    select * from chatuser where id=#{uid}
+  </select> 
+    <!-- 查询允许添加的好友列表-->
+    <!-- #{} 占位符拼接Sql  ? where id = ?
+    	 ${}连接符拼接Sql   + where id = '+id+'
+    -->
+  <select id="FindNoFriendUser" resultType="org.cdlg.group.entity.User" parameterType="map"> 
+     select * from chatuser where 
+     userid != #{userid} 
+     and checkType !=3 
+    and id not in(select friendid from friend where mineid = #{mineid}) 
+    <!-- 动态语句的判断 -->
+    <if test="searchid !=null and searchid !=''">
+    and userid = #{searchid}
+    </if>
+    <if test="searchnickname !=null and searchnickname !=''">
+    and nickname like '%${searchnickname}%'
+    </if>
+    order by id
+    limit #{startindex},3
+  </select>
+    <!-- 根据好友Id -->
+    <select id="FindFriendUserById" parameterType="int" resultType="org.cdlg.group.entity.User"> 
+    select * from chatuser where id in(select friendid from friend where mineid = #{uid} )
+  </select> 
+    <!-- 统计非好友的个数 -->
+    <select id="FindFriendcount" resultType="int" parameterType="map"> 
+     	select count(1) ts from chatuser where 
+     	userid != #{userid} 
+     	and checkType !=3 
+    	and id not in(select friendid from friend where mineid = #{mineid}) 
+    	<!-- 动态语句的判断 -->
+    	<if test="searchid !=null and searchid !=''">
+    		and userid = #{searchid}
+    	</if>
+    	<if test="searchnickname !=null and searchnickname !=''">
+    		and nickname like '%${searchnickname}%'
+    	</if>
+ 	 </select>
+ 	 
+  <!-- 增加用户 -->
+  <insert id="AddUser" parameterType="org.cdlg.group.entity.User">
+    insert into chatuser(userid,password) values(#{userid},#{password}) 
+  </insert> 
+  <!-- 增加好友 的信息-->
+   <insert id="addFriend" >
+    	insert into friend(mineid,friendid) values(#{mineid},#{friendid}) 
+   </insert> 
+  
+ <update id="UpdateUser" parameterType="org.cdlg.group.entity.User" >
+ update chatuser set nickname=#{nickname},checktype=#{checktype},sex=#{sex},age=#{age},profile=#{profile} where userid=#{userid}
+ </update>
+  
+</mapper>
